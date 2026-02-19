@@ -37,14 +37,12 @@ public class AverageAgeTasklet implements Tasklet {
             element = optional.get();   // update
         } else {
             element = new Statistique(); // insert première fois
-            element.setId(1L);
         }
 
 
         element.setMoyenne(avgAge);
 
-        //stats.save(element);
-        stats.saveAndFlush(element);
+        stats.save(element);
 
         return RepeatStatus.FINISHED;
     }
