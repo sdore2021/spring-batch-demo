@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  postgres:
+    container_name: postgress-db
+    image: postgres:18
+    environment:
+      - POSTGRES_DB=mydbTest
+      - POSTGRES_USER=sam
+      - POSTGRES_PASSWORD=sam
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./authentication.sql:/docker-entrypoint-initdb.d/authentication.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - learn-docker
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - 'PGADMIN_DEFAULT_EMAIL=mydb@test.net'
+      - 'PGADMIN_DEFAULT_PASSWORD=sam'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - learn-docker
+
+volumes:
+  postgres_data:
+
+networks:
+  learn-docker:
