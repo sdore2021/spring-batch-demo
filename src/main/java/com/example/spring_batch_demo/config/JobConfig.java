@@ -1,11 +1,15 @@
 package com.example.spring_batch_demo.config;
 
+import com.example.spring_batch_demo.model.FullName;
 import com.example.spring_batch_demo.model.Person;
+import com.example.spring_batch_demo.processor.JdbcProcessor5;
 import com.example.spring_batch_demo.processor.Processor1;
+import com.example.spring_batch_demo.reader.JdbcReader5;
 import com.example.spring_batch_demo.tasklet.AverageAgeTasklet;
 import com.example.spring_batch_demo.tasklet.CleanTasklet;
 import com.example.spring_batch_demo.tasklet.MaxAgeTasklet;
 import com.example.spring_batch_demo.tasklet.MinAgeTasklet;
+import com.example.spring_batch_demo.writer.JdbcWriter5;
 import com.example.spring_batch_demo.writer.Writter1;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.job.Job;
@@ -13,8 +17,8 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
-import org.springframework.batch.infrastructure.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,13 +31,22 @@ import java.io.IOException;
 public class JobConfig {
 
     @Bean
-    public Job myJob(JobRepository jobRepository, Step cleanUp, Step step1, Step step2, Step step3, Step step4){
+    public Job myJob(
+            JobRepository jobRepository,
+            Step cleanUp,
+            Step step1,
+            Step step2,
+            Step step3,
+            Step step4,
+            Step jdbcStep5
+    ){
         return new JobBuilder("myJob", jobRepository)
                 .start(cleanUp)
                 .next(step1)
                 .next(step2)
                 .next(step3)
                 .next(step4)
+                .next(jdbcStep5)
                 .build();
     }
 
@@ -98,6 +111,24 @@ public class JobConfig {
         return new StepBuilder("cleanUp", jobRepository)
                 .tasklet(tasklet, transactionManager)
                 .build();
+    }
+
+
+    @Bean
+    public Step jdbcStep5(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager,
+            @Qualifier("jdbcreader") JdbcCursorItemReader<FullName> jdbcReader5,
+            JdbcProcessor5 jdbcProcessor5,
+            JdbcWriter5 jdbcWritter5
+    ) throws IOException {
+        return new StepBuilder("jdbcStep5",jobRepository)
+                .<FullName, FullName>chunk(5).transactionManager(transactionManager)
+                .reader(jdbcReader5)
+                .processor(jdbcProcessor5)
+                 .writer(jdbcWritter5)
+                .build();
+
     }
 
 
