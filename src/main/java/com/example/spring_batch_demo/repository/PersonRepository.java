@@ -21,7 +21,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "TRUNCATE TABLE person", nativeQuery = true)
+    @Query(value = "TRUNCATE TABLE person, nombre_by_date, nombre_by_date_age", nativeQuery = true)
     void cleanTable();
 
 }

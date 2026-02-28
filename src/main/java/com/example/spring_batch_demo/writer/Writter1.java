@@ -24,7 +24,7 @@ public class Writter1 implements ItemWriter<Person> {
     public void write(Chunk<? extends Person> chunk) throws Exception {
 
         List<Person> items = (List<Person>) chunk.getItems();
-        System.out.println("writing..." + items.size());
+        //System.out.println("writing..." + items.size());
         // Sauvegarde en DB
         personService.saveAll(items);
 

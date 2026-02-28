@@ -5,12 +5,16 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
+
 
 @Component
 public class Reader1 {
@@ -22,9 +26,9 @@ public class Reader1 {
         resource = new FileSystemResource("src/main/resources/file1.csv");
         System.out.println("reading... " + resource.getFile());
 
-        final var fieldSetMapper = new BeanWrapperFieldSetMapper<Person>();
+        /*final var fieldSetMapper = new BeanWrapperFieldSetMapper<Person>();
         fieldSetMapper.setTargetType(Person.class);
-        fieldSetMapper.setDistanceLimit(0);
+        fieldSetMapper.setDistanceLimit(0);*/
 
 
         return new FlatFileItemReaderBuilder<Person>()
@@ -32,10 +36,27 @@ public class Reader1 {
                 .resource(resource)
                 .delimited()
                 .delimiter(";")
-                .names("nom", "prenom","age")
-                .fieldSetMapper(fieldSetMapper)
+                .names("nom", "prenom","age","createdAt")
+                .fieldSetMapper(fieldSetMapper())
                 .linesToSkip(1) // skip header
                 .build();
 
+    }
+
+    @Bean
+    public FieldSetMapper<Person> fieldSetMapper() {
+        return fieldSet -> {
+            Person p = new Person();
+            p.setNom(fieldSet.readString("nom"));
+            p.setPrenom(fieldSet.readString("prenom"));
+            p.setAge(fieldSet.readInt("age"));
+
+            String dateStr = fieldSet.readString("createdAt");
+
+            Instant instant = Instant.parse(dateStr); // gère le Z (UTC)
+            p.setCreatedAt(Date.from(instant));
+
+            return p;
+        };
     }
 }

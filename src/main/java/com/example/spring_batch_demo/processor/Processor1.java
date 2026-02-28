@@ -12,9 +12,9 @@ public class Processor1 implements ItemProcessor<Person,Person> {
 
     @Override
     public @Nullable Person process(@NotNull Person item) throws Exception {
-        System.out.println("Processing 1....." + item.getInformation());
+        //System.out.println("Processing 1....." + item.getInformation());
 
-        if(item.getAge() <= 28) return null;
+        //if(item.getAge() <= 28) return null;
 
         return item;
     }

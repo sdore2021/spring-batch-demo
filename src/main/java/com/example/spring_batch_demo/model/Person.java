@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.util.Date;
+
 
 @Entity
 public class Person {
@@ -16,6 +18,7 @@ public class Person {
     private String nom;
     private String prenom;
     private int age;
+    private Date createdAt;
 
     public Long getId() {
         return id;
@@ -23,6 +26,14 @@ public class Person {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getNom() { return nom; }
@@ -36,6 +47,6 @@ public class Person {
 
 
     public String getInformation(){
-        return String.format("%s %s %s",getPrenom(),getNom(),getAge());
+        return String.format("%s %s %s %s",getPrenom(),getNom(),getAge(),getCreatedAt());
     }
 }
